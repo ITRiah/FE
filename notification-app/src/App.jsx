@@ -1,28 +1,29 @@
 import { useEffect } from "react";
 import saveFcmToken from "./firebase/fcm";
-import DateRangeForm from './components/DateRangeForm';
 import StatisticsChart from './components/ChartData';
 
-
 function App() {
-  // useEffect(() => {
-  //   // Giả sử userId lấy từ state, context, hoặc sau khi đăng nhập
-  //   const userIds = [1, 2, 3, 4, 5]; // Thay bằng danh sách userId thực tế
-  //   userIds.forEach((userId) => {
-  //     console.log("Gọi saveFcmToken cho userId:", userId);
-  //     saveFcmToken(userId);
-  //   });
-  // }, []);
+  useEffect(() => {
+    // Đăng ký Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
 
-  // return (
-  //   <div>
-  //     <h1>Reservation App</h1>
-  //     <p>Check console for FCM token status</p>
-  //   </div>
-  // );
+    // Gọi saveFcmToken dựa trên userId từ cookie
+    console.log("Gọi saveFcmToken với userId từ cookie");
+    saveFcmToken();
+  }, []);
 
   return (
     <div className="App">
+      <h1>Reservation App</h1>
+      <p>Check console for FCM token status. Set cookie 'userId' to test different users.</p>
       <StatisticsChart />
     </div>
   );
