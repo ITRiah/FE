@@ -87,7 +87,17 @@ function showNextNotification() {
 
   currentNotification.onclick = (event) => {
     event.preventDefault();
-    window.open("https://your-app.com/detail?userId=" + getUserIdFromCookie());
+    const userId = getUserIdFromCookie();
+    const redirectUrl = "https://your-app.com/detail?userId=" + userId;
+
+    // Kiểm tra nếu người dùng ở trong web
+    if (document.hidden) {
+      // Nếu ở chế độ nền, mở cửa sổ mới
+      window.open(redirectUrl);
+    } else {
+      // Nếu ở trong web, redirect trong tab hiện tại
+      window.location.href = redirectUrl;
+    }
   };
 }
 

@@ -85,8 +85,29 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const action = event.action;
   if (action === 'open') {
+    const userId = getUserIdFromCookie();
+    const redirectUrl = 'https://your-app.com/detail?userId=' + userId;
+
     event.waitUntil(
-      self.clients.openWindow('https://your-app.com/detail?userId=' + getUserIdFromCookie())
+      self.clients.matchAll().then(clients => {
+        const isWebOpen = clients.some(client => client.url === location.origin && client.visibilityState !== 'hidden');
+        if (isWebOpen) {
+          // Nếu web đang mở, gửi thông điệp để redirect trong tab hiện tại
+          clients.forEach(client => {
+            client.postMessage({ type: 'REDIRECT', url: redirectUrl });
+          });
+        } else {
+          // Nếu web không mở, mở cửa sổ mới
+          self.clients.openWindow(redirectUrl);
+        }
+      })
     );
+  }
+});
+
+// Lắng nghe thông điệp từ Service Worker trong client
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'REDIRECT') {
+    // Không cần xử lý ở đây vì redirect sẽ được xử lý ở client
   }
 });
